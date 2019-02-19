@@ -1,6 +1,6 @@
 # dotnet-Core notes of creating a web application and manipulate a relational database 
 
-1.	Create container, name whatever
+1.	Create container, name LW+(database name)+container
 2.	Add new project RC on container name in solution explorer, remember change authentication  to “individual user account”
 3.	warning: Better don’t change added controller names, delete controller and view folder and add it again/  if need to change the name, the view folder name needed to be changed accordingly manually.!!! 
 ???namespace  using LWBusService. Models & LWBusService.Data
