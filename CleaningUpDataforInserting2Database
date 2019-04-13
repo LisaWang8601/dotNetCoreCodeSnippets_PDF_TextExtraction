@@ -1,0 +1,73 @@
+@{
+    string fileName = ViewBag.FileName;
+    ViewData["Title"] = fileName +"  ~ YorkTemplate";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Dictionary<string, string> outputAndField = ViewBag.Display;
+
+    // need to write carrier name to all policies under this template
+
+    const int NUMBER_OF_ROWS = 9;
+    string[] DateString = new string[NUMBER_OF_ROWS];
+    string day = "";
+    string month = "";
+    string year = "";
+    string[] expiryDate = new string[NUMBER_OF_ROWS];
+    int[] policy_ordinal_row = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // marks which row has value and the ordinal number of the non-empty rows
+    string[] items = { "", "", "" };
+    string[] expiry_field_names = { "Expiry date - CGL", "Expiry date – CGL non-owned auto", "Expiry date – CGL employer liability", "Expiry date – automobile Liability", "Expiry date – excess or umbrella liability", "Expiry date – professional liability", "Expiry date – cyber liability", "Expiry date – other liability 1", "Expiry date – other liability 2" };
+
+    int i = 0; // record the number of policies with value;
+    int n_of_policies = 0;
+    for (i = 0; i < NUMBER_OF_ROWS; i++)
+    {
+        if (outputAndField[expiry_field_names[i]] != "")
+        {
+        // this part deal with inconsistancy of date input - some are MM/DD/YY - need to convert to MM/DD/YYYY for writing into the database
+            DateString[i] = outputAndField[expiry_field_names[i]];
+            items = DateString[i].Split('/');
+            month = items[0];
+            day = items[1];
+            year = items[2];
+            if (year.Length == 2)
+            {
+                year = "20" + year;
+            }
+            expiryDate[i] = $"{month}/{day}/{year}";
+
+            policy_ordinal_row[i] = n_of_policies; // sample form with row 0, 1, 2, 4 having values. this number is <4
+            n_of_policies++;
+        }
+    }
+
+    int TOTAL_N_POLICIES = n_of_policies;
+
+    if (TOTAL_N_POLICIES >= 5)
+    {
+        TOTAL_N_POLICIES = 4;
+        TempData["Alert"] = "More than 4 policies on this form! Please handle pilocy #5 and above manually.";
+    }
+    // Cname stands for "Column name" 
+    string[] carriers_Cname = { "Carrier", "Carrier2", "Carrier3", "Carrier4" };
+    string[] type_of_coverage_Cname = { "TypeCoverage", "TypeCoverage2", "TypeCoverage3", "TypeCoverage4" }; 
+    string[] type_of_coverage = { "CGL", "CGL non-owned Auto", "CGL employer liability", "automobile Liability", "excess or umbrella liability", "professional liability", "cyber liability", "other liability 1", "other liability 2" };
+    string[] policy_numbers_Cname = { "PolicyNumber", "PolicyNumber2", "PolicyNumber3", "PolicyNumber4" };
+    string[] expiry_dates_Cname = { "ExpiryDate", "ExpiryDate2", "ExpiryDate3", "ExpiryDate4" };
+    string[] limits_Cname = { "Coverage", "Coverage2", "Coverage3", "Coverage4" };
+
+    <input asp-for="Contractid" class="form-control" value="@ViewBag.ContractId" type="hidden" />
+    <input asp-for="CustId" class="form-control" value="@ViewBag.CustId" type="hidden" />
+    for (i = 0; i < TOTAL_N_POLICIES; i++)
+    {
+        <input asp-for="@carriers_Cname[i]" value="@outputAndField["Carrier name"]" type="hidden" />
+    }
+    int n = 0;
+    for (i = 0; i < 9; i++)
+    {
+        if (outputAndField[expiry_field_names[i]] != "")
+        {
+            <input asp-for="@type_of_coverage_Cname[n]" value="@type_of_coverage[i]" type="hidden" />
+            n++;
+        }
+        if (n == 4) { i = 9; break; }
+    }
+}
