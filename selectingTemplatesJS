@@ -1,4 +1,4 @@
-// this is part of the site.js in the .Net Core project.
+// this is part of the site.js in a .Net Core project extracting data from pdf forms and write into a SQL database.
 // logic here needs to simplify!
 
  $('#fileList').change(function ()
