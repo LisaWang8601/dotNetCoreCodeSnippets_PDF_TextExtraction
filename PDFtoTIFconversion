@@ -1,0 +1,55 @@
+// Part of console app doing PDF to Tiff conversion. Tiff images will be croped and fed into tesseract OCR for data extraction. 
+//Useful for scanned PDF (which contains only an image each page, no serachable text) or PDF with encoding problem which cause trouble to extract using PDF rendering tools. 
+var pdfFiles = Directory.EnumerateFiles(inputPdfDir, "*.pdf", SearchOption.AllDirectories);
+        
+                foreach (string currentFile in pdfFiles)
+                {
+                    string fileName = currentFile.Substring(inputPdfDir.Length);  //+1);
+                    string inputPdfPath = inputPdfDir + fileName;
+                try
+                {
+                    Console.Write("Converting " + fileName + " to a tiff image...");
+                    using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer())
+                    {
+                        byte[] buffer = File.ReadAllBytes(inputPdfPath);
+                        MemoryStream ms = new MemoryStream(buffer);
+
+                        rasterizer.Open(ms);
+
+                        if (rasterizer.PageCount != 1)
+                        {
+                            for (int pageNumber = 1; pageNumber <= rasterizer.PageCount; pageNumber++)
+                            {
+                                string fileNameNoExt = System.IO.Path.GetFileNameWithoutExtension(fileName);
+                                string pageFilePath = Path.Combine(outputTifDir, fileNameNoExt + "-Page-" + pageNumber.ToString() + ".tif"); //".tif");
+                                Image img = rasterizer.GetPage(desired_x_dpi, desired_y_dpi, pageNumber);
+                                img.Save(pageFilePath, ImageFormat.Tiff); // Tiff);
+                                Console.WriteLine(pageFilePath);
+                            }
+                        }
+                        else
+                        {
+                            string fileNameNoExt = System.IO.Path.GetFileNameWithoutExtension(fileName);
+                            string pageFilePath = Path.Combine(outputTifDir, fileNameNoExt + ".tif"); //".tif");
+
+                            Image img = rasterizer.GetPage(desired_x_dpi, desired_y_dpi, 1);
+                            img.Save(pageFilePath, ImageFormat.Tiff); // Tiff);
+
+                            Console.WriteLine(pageFilePath);
+                        }
+                    }
+                    Console.Write("Press any key to continue to the next pdf file");
+                    Console.ReadKey(true);
+                    Directory.Move(currentFile, Path.Combine(archivePdfDir, fileName));
+                    
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Directory.Move(currentFile, Path.Combine(failedToProcessPdfDir, fileName));
+                }
+                }
+  //==================================================================================================
+  //  The Rasterizer code from this repo:          
+            
