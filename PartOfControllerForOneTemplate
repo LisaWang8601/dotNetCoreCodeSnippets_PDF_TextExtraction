@@ -1,0 +1,65 @@
+ // Some of the variables names were changed for confidentiality reason.
+ 
+ public class CustomerApplicationController : Controller
+    {
+        private readonly AbcdDBContext _context;
+
+        public CustomerApplicationController(AbcdDBContext context)
+        {
+            _context = context;
+        }
+        public async Task<IActionResult> BTemplate(string parameter)
+        {
+            string currentfileName = parameter;
+
+            string filePath = System.IO.Path.Combine("wwwroot/forms", currentfileName);
+
+            string currentTemplate = "B.tif";
+            ViewBag.FileName = currentfileName;
+            ViewBag.TemplateName = currentTemplate.Replace("\"", "");
+
+            if (Path.GetExtension(currentfileName) == ".pdf")
+            {
+                ViewBag.FileExt = "pdf";
+
+                B b = new B();
+
+                  ITextSharp getText = new ITextSharp();
+
+                ViewBag.Display = getText.GetText(filePath, b.GetCoordinates(), b.GetItemNames());
+
+                var AbcdDBContext = _context.CustomerApplications.Include(v => v.Cont);
+
+                var userName = "B_admin";
+                var userId = _context.AbcdUsers.Where(c => c.Username == userName).Select(c => c.UserId).FirstOrDefault();
+                ViewData["CustomerId"] = userId;
+
+                return View();
+            }
+            else if (Path.GetExtension(currentfileName) == ".tif")
+
+            {
+                ViewBag.FileExt = "tif";
+                // do OCR for Tiff image input
+                Tesseract getText = new Tesseract();
+                B_ocr b_ocr = new B_ocr();
+
+                ViewBag.Display = getText.Bitmap(b_ocr.GetCoordinates(), _ocrb.GetItemNames(), filePath);
+
+                var AbcdDBContext = _context.CustomerApplications.Include(v => v.Cont);
+
+
+                var userName = "B_admin";
+               var userId = _context.Users.Where(c => c.Username == userName).Select(c => c.UserId).FirstOrDefault();
+                ViewData["CustomerId"] = userId;
+
+                return View();
+
+            }
+            else
+            {
+                // what message to put on the screen  - use ViewData["message"]
+                TempData["message"] = "Please choose a PDF or Tiff file as input.";
+                return View();
+            }
+        }
