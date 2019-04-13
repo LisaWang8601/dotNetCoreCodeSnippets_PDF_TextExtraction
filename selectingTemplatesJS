@@ -1,0 +1,55 @@
+// this is part of the site.js in the .Net Core project.
+// logic here needs to simplify!
+
+ $('#fileList').change(function ()
+        {
+            var url;
+            var e = document.getElementById("templates");
+            var sTemplates = e.options[e.selectedIndex].value;
+
+            if (($("#fileList option:selected").length > 0) && (sTemplates == "a")) {
+                alert("Using A template!");
+                url = "/CustomerApplication/ATemplate";
+                var fileName = $('#fileList').val();
+                url += "?parameter=" + fileName;
+                location.href = url;
+            }
+            else if (($("#fileList option:selected").length > 0) && (sTemplates == "mcmaster-rda")) {
+                alert("Using McMaster-RDA template");
+                url = "/VendorApplication/McMasterUpdatedTemplete";
+                var fileName = $('#fileList').val();
+                url += "?parameter=" + fileName;
+                location.href = url;
+            }
+            else if (($("#fileList option:selected").length > 0) && (sTemplates == "york")) {
+                alert("Using York template");
+                url = "/VendorApplication/YorkTemplate";
+                var fileName = $('#fileList').val();
+                url += "?parameter=" + fileName;
+                location.href = url;
+            }
+            else if (($("#fileList option:selected").length > 0) && (sTemplates == "mcmaster-aon")) {
+                alert("Using McMaster-Aon Stenhouse template");
+                url = "/VendorApplication/McMaster2018_19Template";
+                var fileName = $('#fileList').val();
+                url += "?parameter=" + fileName;
+                location.href = url;
+            }
+            else if (($("#fileList option:selected").length > 0) && (sTemplates == "none")) {
+                alert("Please choose a template!");
+                url = "/VendorApplication/file_uploading";
+            }
+            else if (($("#fileList option:selected").length = 0) && (sTemplates != "none")) {
+                alert("Please choose a form file!");
+                url = "/VendorApplication/file_uploading";
+            }
+            else
+            {
+                alert("Please choose a template and a form file!");
+                url = "/VendorApplication/file_uploading";
+            }
+
+                return false;
+            
+
+        });
